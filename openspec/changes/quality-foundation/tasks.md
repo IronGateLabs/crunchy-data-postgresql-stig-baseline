@@ -4,13 +4,13 @@
 - [x] 1.2 Add `Rakefile` defining `inspec:check`, `lint` (via `RuboCop::RakeTask`, which provides `lint:auto_correct`), `test`, and `pre_commit_checks: [:lint, :test, 'inspec:check']`
 - [x] 1.3 Add `.ruby-version` pinned to 3.1.2
 - [x] 1.4 Add `.rubocop.yml` tuned for the InSpec control DSL (Naming/FileName + idiomatic-matcher cops disabled, metrics relaxed)
-- [~] 1.5 Run `bundle install` and commit the resulting `Gemfile.lock` (bundle install verifying in background)
+- [x] 1.5 Run `bundle install` and commit the resulting `Gemfile.lock` (with x86_64-linux + darwin platforms for CI/local)
 
 ## 2. Verify the documented commands work
 
-- [~] 2.1 Confirm `bundle exec rake inspec:check` validates the profile (verifying in background)
-- [x] 2.2 Confirm `bundle exec rake lint` runs RuboCop — baseline now 0 offenses across 117 files
-- [~] 2.3 Confirm `bundle exec rake pre_commit_checks` runs all gates (lint + test verified; inspec:check pending bundle)
+- [x] 2.1 Confirm `bundle exec rake inspec:check` validates the profile — Valid, 113 controls (green in CI)
+- [x] 2.2 Confirm `bundle exec rake lint` runs RuboCop — 0 offenses (verified against locked 1.84.2; green in CI)
+- [x] 2.3 Confirm `bundle exec rake pre_commit_checks` runs all gates (lint + test + inspec:check, all green)
 - [x] 2.4 Lint blocking decision: green + blocking, achieved via safe autocorrect (`rubocop -a`) of cosmetic offenses, isolated for a dedicated commit
 
 ## 3. CI: lint & check
@@ -40,6 +40,10 @@
 
 ## 7. Wrap-up
 
-- [ ] 7.1 Document required repo secrets (`SONAR_TOKEN`, `CODECOV_TOKEN`) and SonarCloud org setup for the fork owner
-- [ ] 7.2 Verify all workflows run green (or expected-red per 6.3) on a test PR against the fork
-- [ ] 7.3 Reconcile the README's quality-workflow section with what now exists (add unit-test/coverage commands)
+- [x] 7.1 Document required repo secrets (`SONAR_TOKEN`, `CODECOV_TOKEN`) and SonarCloud setup in the README
+- [x] 7.2 Verify all workflows run green on the draft PR (lint, validate, quality all ✅ on PR #1)
+- [x] 7.3 Reconcile the README's quality-workflow section (added `rake test`, CI section, InSpec 5 note)
+
+> Remaining manual step for the fork owner: disable **Automatic Analysis** in the
+> SonarCloud project so the CI scan (with coverage) runs, then drop
+> `continue-on-error` from the SonarCloud step in `quality.yml`.
