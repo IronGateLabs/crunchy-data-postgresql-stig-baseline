@@ -36,10 +36,13 @@ jobs:
           files: coverage/lcov.info
           fail_ci_if_error: false
 
-      # Requires "Automatic Analysis" to be OFF in the SonarCloud project
-      # (Administration > Analysis Method) so this CI scan is the analysis method.
+      # TEMPORARY continue-on-error: the SonarCloud project still has "Automatic
+      # Analysis" enabled, which conflicts with this CI scan. Once it is disabled
+      # (Administration > Analysis Method) and a scan succeeds, remove this line
+      # to make the gate blocking.
       - name: SonarCloud scan
         if: ${{ env.SONAR_TOKEN != '' }}
+        continue-on-error: true
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_HOST_URL: https://sonarcloud.io
