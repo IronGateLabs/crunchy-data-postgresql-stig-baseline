@@ -24,10 +24,8 @@ Lint/EmptyBlock:
   Enabled: false
 
 # Legacy patterns in the upstream postgres_session resource (kept as-is to match
-# upstream): two classes per file, an optional arg before a required one, and an
-# initialize that does not call super.
-Style/OneClassPerFile:
-  Enabled: false
+# upstream): an optional arg before a required one, and an initialize that does
+# not call super.
 Style/OptionalArguments:
   Enabled: false
 Lint/MissingSuper:
