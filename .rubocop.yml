@@ -1,0 +1,53 @@
+plugins:
+  - rubocop-rake
+
+AllCops:
+  TargetRubyVersion: 3.1
+  NewCops: enable
+  Exclude:
+    - 'vendor/**/*'
+    - 'coverage/**/*'
+
+# Control files are named by STIG ID (V-233xxx.rb) by design.
+Naming/FileName:
+  Enabled: false
+
+# Idiomatic InSpec matcher style: `its('x') { should match /y/ }`.
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+# Controls use empty `describe sql.query('DROP ROLE ...') do end` blocks to run
+# teardown SQL for its side effect, with no assertions — intentional.
+Lint/EmptyBlock:
+  Enabled: false
+
+# Legacy patterns in the upstream postgres_session resource (kept as-is to match
+# upstream): two classes per file, an optional arg before a required one, and an
+# initialize that does not call super.
+Style/OneClassPerFile:
+  Enabled: false
+Style/OptionalArguments:
+  Enabled: false
+Lint/MissingSuper:
+  Enabled: false
+Style/RedundantInterpolation:
+  Enabled: false
+
+# InSpec controls are long, declarative DSL blocks with long human-readable
+# strings; these cops fight that intent rather than catch bugs.
+Metrics/BlockLength:
+  Enabled: false
+Layout/LineLength:
+  Enabled: false
+Metrics/MethodLength:
+  Max: 30
+Metrics/AbcSize:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/WordArray:
+  Enabled: false

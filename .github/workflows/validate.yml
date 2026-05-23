@@ -1,0 +1,48 @@
+name: Validate against test DB
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    name: Run profile against docker-compose PostgreSQL
+    runs-on: ubuntu-latest
+    env:
+      CHEF_LICENSE: accept-silent
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Start PostgreSQL test database
+        run: docker compose up -d
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for _ in $(seq 1 30); do
+            if docker compose exec -T db pg_isready -U testuser -d testdb; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "PostgreSQL did not become ready in time" >&2
+          exit 1
+
+      # --no-distinct-exit: control findings against the throwaway DB are expected
+      # and must not fail CI; only a parse/execution error (exit 1) fails the job.
+      - name: Run the profile
+        run: |
+          mkdir -p results
+          bundle exec inspec exec . \
+            --input-file inputs_postgres14_example.yml \
+            --reporter cli json:results/test.json \
+            --no-distinct-exit
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

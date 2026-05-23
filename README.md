@@ -286,16 +286,34 @@ inspec exec ./ --input-file ./inputs_postgres14_example.yml --reporter cli json:
 
 Linting and validating controls:
 ```bash
-  bundle exec rake [inspec or cinc-auditor]:check # Validate the InSpec Profile
-  bundle exec rake lint                           # Run RuboCop Linter
-  bundle exec rake lint:auto_correct              # Autocorrect RuboCop offenses (only when it's safe)
-  bundle exec rake pre_commit_checks              # Pre-commit checks
+  bundle exec rake inspec:check       # Validate the InSpec profile structure
+  bundle exec rake lint               # Run RuboCop
+  bundle exec rake lint:auto_correct  # Autocorrect RuboCop offenses (safe only)
+  bundle exec rake test               # Run unit tests (libraries/) with coverage
+  bundle exec rake pre_commit_checks  # All of the above (lint + test + check)
 ```
 
 Ensure the controls are ready to be committed into the repo:
 ```bash
   bundle exec rake pre_commit_checks
 ```
+
+> [!NOTE]
+> The `Gemfile` pins **InSpec 5**. InSpec 6+ requires a commercial Chef license
+> key; v5 is the last license-free line and is sufficient for this profile. To
+> run with the fully open-source binary instead, substitute `cinc-auditor` for
+> `inspec` in any command.
+
+### Continuous Integration
+GitHub Actions run on every push to `main` and on pull requests:
+- **Lint & Check** — RuboCop and `inspec check`.
+- **Validate against test DB** — starts the docker-compose PostgreSQL and runs the profile against it.
+- **Coverage & SonarCloud** — unit tests + coverage, uploaded to Codecov and scanned by SonarCloud.
+
+The coverage and SonarCloud steps are skipped unless the repository defines the
+`CODECOV_TOKEN` and `SONAR_TOKEN` secrets, so CI stays green before those
+accounts are configured. SonarCloud also requires confirming the organization
+and project keys in `sonar-project.properties`.
 
 
 [top](#table-of-contents)
