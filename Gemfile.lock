@@ -387,7 +387,11 @@ GEM
     faraday-retry (1.0.4)
     faraday_middleware (1.2.1)
       faraday (~> 1.0)
+    ffi (1.17.4)
     ffi (1.17.4-aarch64-linux-gnu)
+    ffi (1.17.4-arm64-darwin)
+    ffi (1.17.4-x86_64-darwin)
+    ffi (1.17.4-x86_64-linux-gnu)
     fuzzyurl (0.9.0)
     google-apis-admin_directory_v1 (0.46.0)
       google-apis-core (>= 0.11.0, < 2.a)
@@ -770,6 +774,10 @@ GEM
 
 PLATFORMS
   aarch64-linux
+  arm64-darwin-23
+  ruby
+  x86_64-darwin-23
+  x86_64-linux
 
 DEPENDENCIES
   inspec (~> 5.22)
