@@ -70,7 +70,7 @@ $ sudo systemctl reload postgresql-${PGVER?})
     its('output') { should_not match /off|false/i }
   end
 
-  log_line_prefix_escapes = %w(%m %u %d %c)
+  log_line_prefix_escapes = %w[%m %u %d %c]
 
   log_line_prefix_escapes.each do |escape|
     describe sql.query('SHOW log_line_prefix;', [input('pg_db')]) do

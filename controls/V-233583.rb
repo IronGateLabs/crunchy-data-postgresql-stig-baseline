@@ -10,7 +10,7 @@ $ cat /proc/sys/crypto/fips_enabled
 If fips_enabled is not "1", this is a finding.'
   desc 'fix', 'If fips_enabled = 0, configure OpenSSL to be FIPS compliant.
 
-Configure per operating system documentation: 
+Configure per operating system documentation:
 RedHat: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/security_guide/chap-federal_standards_and_regulations
 Ubuntu: https://security-certs.docs.ubuntu.com/en/fips
 

@@ -181,8 +181,8 @@ $ sudo systemctl reload postgresql-${PGVER?})
     roles.each do |role|
       next if input('pg_superusers').include?(role)
 
-      superuser_sql = 'SELECT r.rolsuper FROM pg_catalog.pg_roles r '\
-      "WHERE r.rolname = '#{role}';"
+      superuser_sql = 'SELECT r.rolsuper FROM pg_catalog.pg_roles r ' \
+                      "WHERE r.rolname = '#{role}';"
 
       describe sql.query(superuser_sql, [input('pg_db')]) do
         its('output') { should_not eq 't' }
@@ -194,15 +194,15 @@ $ sudo systemctl reload postgresql-${PGVER?})
 
     object_granted_privileges = 'arwdDxtU'
     object_public_privileges = 'r'
-    object_acl = "^((((#{owners})=[#{object_granted_privileges}]+|"\
-      "=[#{object_public_privileges}]+)\/\\w+,?)+|)\\|"
+    object_acl = "^((((#{owners})=[#{object_granted_privileges}]+|" \
+                 "=[#{object_public_privileges}]+)/\\w+,?)+|)\\|"
     object_acl_regex = Regexp.new(object_acl)
 
-    objects_sql = 'SELECT n.nspname, c.relname, c.relkind '\
-      'FROM pg_catalog.pg_class c '\
-      'LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace '\
-      "WHERE c.relkind IN ('r', 'v', 'm', 'S', 'f') "\
-      "AND n.nspname !~ '^pg_' AND pg_catalog.pg_table_is_visible(c.oid);"
+    objects_sql = 'SELECT n.nspname, c.relname, c.relkind ' \
+                  'FROM pg_catalog.pg_class c ' \
+                  'LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace ' \
+                  "WHERE c.relkind IN ('r', 'v', 'm', 'S', 'f') " \
+                  "AND n.nspname !~ '^pg_' AND pg_catalog.pg_table_is_visible(c.oid);"
 
     databases_sql = 'SELECT datname FROM pg_catalog.pg_database where not datistemplate;'
     databases_query = sql.query(databases_sql, [input('pg_db')])
@@ -216,11 +216,11 @@ $ sudo systemctl reload postgresql-${PGVER?})
 
       objects.each do |obj|
         schema, object, type = obj.split('|')
-        relacl_sql = "SELECT pg_catalog.array_to_string(c.relacl, E','), "\
-          'n.nspname, c.relname, c.relkind FROM pg_catalog.pg_class c '\
-          'LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace '\
-          "WHERE n.nspname = '#{schema}' AND c.relname = '#{object}' "\
-          "AND c.relkind = '#{type}';"
+        relacl_sql = "SELECT pg_catalog.array_to_string(c.relacl, E','), " \
+                     'n.nspname, c.relname, c.relkind FROM pg_catalog.pg_class c ' \
+                     'LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace ' \
+                     "WHERE n.nspname = '#{schema}' AND c.relname = '#{object}' " \
+                     "AND c.relkind = '#{type}';"
 
         describe sql.query(relacl_sql, [database]) do
           its('output') { should match object_acl_regex }

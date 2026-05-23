@@ -87,6 +87,7 @@ $ sudo chown -R root:root /usr/pgsql-${PGVER?}'
 
   input('pg_shared_dirs').each do |dir|
     next unless directory(dir).exist?
+
     describe directory(dir) do
       it { should be_owned_by 'root' }
       it { should be_grouped_into 'root' }

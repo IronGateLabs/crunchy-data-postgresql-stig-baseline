@@ -54,8 +54,8 @@ $ sudo systemctl restart postgresql-${PGVER?})
     its('output') { should match /on|true|scram-sha-256/i }
   end
 
-  passwords_sql = 'SELECT usename FROM pg_shadow '\
-    "WHERE passwd !~ '^md5[0-9a-f]+$';"
+  passwords_sql = 'SELECT usename FROM pg_shadow ' \
+                  "WHERE passwd !~ '^md5[0-9a-f]+$';"
 
   describe sql.query(passwords_sql, [input('pg_db')]) do
     its('output') { should eq '' }

@@ -52,17 +52,17 @@ $ psql -c "ALTER FUNCTION <function_name> SECURITY INVOKER"'
 
   sql = postgres_session(input('pg_dba'), input('pg_dba_password'), input('pg_host'), input('pg_port'))
 
-  security_definer_sql = 'SELECT nspname, proname, prosecdef '\
-    'FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid '\
-    "JOIN pg_authid a ON a.oid = p.proowner WHERE prosecdef = 't';"
+  security_definer_sql = 'SELECT nspname, proname, prosecdef ' \
+                         'FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid ' \
+                         "JOIN pg_authid a ON a.oid = p.proowner WHERE prosecdef = 't';"
 
   databases_sql = "SELECT datname FROM pg_catalog.pg_database where datname = '#{input('pg_db')}';"
   databases_query = sql.query(databases_sql, [input('pg_db')])
   databases = databases_query.lines
 
   databases.each do |database|
-    connection_error = "FATAL:\\s+database \"#{database}\" is not currently "\
-    'accepting connections'
+    connection_error = "FATAL:\\s+database \"#{database}\" is not currently " \
+                       'accepting connections'
     connection_error_regex = Regexp.new(connection_error)
 
     sql_result = sql.query(security_definer_sql, [database])
