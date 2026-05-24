@@ -36,6 +36,19 @@ jobs:
           files: coverage/lcov.info
           fail_ci_if_error: false
 
+      # TEMPORARY diagnostic: report the server-side analysis-method setting so we
+      # can confirm whether Automatic Analysis is actually disabled. Remove once
+      # the CI scan succeeds.
+      - name: Diagnose SonarCloud analysis method
+        if: ${{ env.SONAR_TOKEN != '' }}
+        run: |
+          echo "::group::project settings (auto*)"
+          curl -s -u "$SONAR_TOKEN:" "https://sonarcloud.io/api/settings/values?component=IronGateLabs_crunchy-data-postgresql-stig-baseline" | tr ',{}' '\n' | grep -i auto || echo "no auto* project settings"
+          echo "::endgroup::"
+          echo "::group::org settings (auto*)"
+          curl -s -u "$SONAR_TOKEN:" "https://sonarcloud.io/api/settings/values?organization=irongatelabs" | tr ',{}' '\n' | grep -i auto || echo "no auto* org settings"
+          echo "::endgroup::"
+
       # TEMPORARY continue-on-error: the SonarCloud project still has "Automatic
       # Analysis" enabled, which conflicts with this CI scan. Once it is disabled
       # (Administration > Analysis Method) and a scan succeeds, remove this line
