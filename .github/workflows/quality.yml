@@ -29,11 +29,6 @@ jobs:
       - name: Run unit tests with coverage
         run: bundle exec rake test
 
-      # SimpleCov-lcov writes "SF:./libraries/..."; strip the leading ./ so
-      # SonarCloud matches the coverage to the analyzed source files.
-      - name: Normalize coverage paths for SonarCloud
-        run: sed -i 's#SF:\./#SF:#' coverage/lcov.info
-
       - name: Upload coverage to Codecov
         if: ${{ env.CODECOV_TOKEN != '' }}
         uses: codecov/codecov-action@v4
@@ -49,6 +44,6 @@ jobs:
       - name: SonarCloud scan
         if: ${{ env.SONAR_TOKEN != '' }}
         continue-on-error: true
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_HOST_URL: https://sonarcloud.io
