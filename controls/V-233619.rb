@@ -11,7 +11,7 @@ The standard for validating cryptographic modules will transition to the NIST FI
 FIPS 140-2 modules can remain active for up to five years after validation or until September 21, 2026, when the FIPS 140-2 validations will be moved to the historical list.  Even on the historical list, CMVP supports the purchase and use of these modules for existing systems. While Federal Agencies decide when they move to FIPS 140-3 only modules, purchasers are reminded that for several years there may be a limited selection of FIPS 140-3 modules from which to choose. CMVP recommends purchasers consider all modules that appear on the Validated Modules Search Page:
 https://csrc.nist.gov/projects/cryptographic-module-validation-program/validated-modules
 
-More information on the FIPS 140-3 transition can be found here: 
+More information on the FIPS 140-3 transition can be found here:
 https://csrc.nist.gov/Projects/fips-140-3-transition-effort/'
   desc 'check', 'As the system administrator, run the following:
 

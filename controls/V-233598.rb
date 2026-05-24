@@ -13,41 +13,41 @@ and configuring PostgreSQL audit tools to capture the necessary audit trail. Des
 that applications pass individual user identification to PostgreSQL, even where the application connects to
 PostgreSQL with a standard, shared account.'
   desc 'check', %q(First, as the database administrator, review the current log_line_prefix settings by running
-	the following SQL: 
+	the following SQL:
 
-$ sudo su - postgres 
-$ psql -c "SHOW log_line_prefix" 
+$ sudo su - postgres
+$ psql -c "SHOW log_line_prefix"
 
-If log_line_prefix does not contain at least '< %m %a %u %d %r %p >', this is a finding. 
+If log_line_prefix does not contain at least '< %m %a %u %d %r %p >', this is a finding.
 
-Next, review the current shared_preload_libraries settings by running the following SQL: 
+Next, review the current shared_preload_libraries settings by running the following SQL:
 
-$ psql -c "SHOW shared_preload_libraries" 
+$ psql -c "SHOW shared_preload_libraries"
 
 If shared_preload_libraries does not contain "pgaudit", this is a finding.)
   desc 'fix', %q(Note: The following instructions use the PGDATA and PGVER environment variables. See
 	supplementary content APPENDIX-F for instructions on configuring PGDATA and APPENDIX-H for PGVER.
 
 Configure the database to supply additional auditing information to protect against a user falsely repudiating having
-performed organization-defined actions. 
+performed organization-defined actions.
 
 Using "pgaudit", PostgreSQL can be configured to audit these requests. See supplementary content APPENDIX-B for
-documentation on installing pgaudit. 
+documentation on installing pgaudit.
 
-To ensure logging is enabled, review supplementary content APPENDIX-C for instructions on enabling logging. 
+To ensure logging is enabled, review supplementary content APPENDIX-C for instructions on enabling logging.
 
-Modify the configuration of audit logs to include details identifying the individual user: 
+Modify the configuration of audit logs to include details identifying the individual user:
 
-First, as the database administrator (shown here as "postgres"), edit postgresql.conf: 
+First, as the database administrator (shown here as "postgres"), edit postgresql.conf:
 
-$ sudo su - postgres 
-$ vi ${PGDATA?}/postgresql.conf 
+$ sudo su - postgres
+$ vi ${PGDATA?}/postgresql.conf
 
-Extra parameters can be added to the setting log_line_prefix to identify the user: 
+Extra parameters can be added to the setting log_line_prefix to identify the user:
 
-log_line_prefix = '< %m %a %u %d %r %p >' 
+log_line_prefix = '< %m %a %u %d %r %p >'
 
-Now, as the system administrator, reload the server with the new configuration: 
+Now, as the system administrator, reload the server with the new configuration:
 
 $ sudo systemctl reload postgresql-${PGVER?}
 
@@ -65,7 +65,7 @@ account, ensure it also captures the individual user identification and passes i
 
   sql = postgres_session(input('pg_dba'), input('pg_dba_password'), input('pg_host'), input('pg_port'))
 
-  log_line_prefix_escapes = %w(%m %u %d %p %r %a)
+  log_line_prefix_escapes = %w[%m %u %d %p %r %a]
 
   log_line_prefix_escapes.each do |escape|
     describe sql.query('SHOW log_line_prefix;', [input('pg_db')]) do

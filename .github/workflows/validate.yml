@@ -1,0 +1,55 @@
+name: Validate against test DB
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    name: Run profile against docker-compose PostgreSQL
+    runs-on: ubuntu-latest
+    env:
+      CHEF_LICENSE: accept-silent
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Start PostgreSQL test database
+        run: docker compose up -d
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for _ in $(seq 1 30); do
+            if docker compose exec -T db pg_isready -U testuser -d testdb; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "PostgreSQL did not become ready in time" >&2
+          exit 1
+
+      # This job is a smoke test: it proves the profile parses and executes
+      # against a live database. Control pass/fail is expected (the vanilla test
+      # DB is not hardened), so we ignore inspec's exit code and instead assert
+      # that it produced a results file containing executed controls. A parse or
+      # load error yields no controls and fails the job.
+      - name: Run the profile
+        run: |
+          mkdir -p results
+          bundle exec inspec exec . \
+            --input-file inputs_postgres14_example.yml \
+            --reporter cli json:results/test.json || true
+
+      - name: Assert the profile executed
+        run: |
+          test -s results/test.json
+          ruby -rjson -e 'c = (JSON.parse(File.read("results/test.json"))["profiles"][0]["controls"] rescue nil); abort "profile produced no control results" if c.nil? || c.empty?; puts "#{c.size} controls executed"'
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

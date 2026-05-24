@@ -50,8 +50,8 @@ total 32
 -rw-------. 1 postgres postgres 8288 Apr 11 17:36 postgresql-Mon.log
 -rw-------. 1 postgres postgres 0 Apr 9 00:00 postgresql-Sat.log
 -rw-------. 1 postgres postgres 0 Apr 10 00:00 postgresql-Sun.log
--rw-------. 1 postgres postgres 16212 Apr 7 17:05 postgresql-Thu.log 
--rw-------. 1 postgres postgres 1130 Apr 6 17:56 postgresql-Wed.log 
+-rw-------. 1 postgres postgres 16212 Apr 7 17:05 postgresql-Thu.log
+-rw-------. 1 postgres postgres 1130 Apr 6 17:56 postgresql-Wed.log
 
 If logs with 600 permissions do not exist in ${PG_LOG?}, this is a finding.)
   desc 'fix', %q(Note: The following instructions use the PGDATA and PGVER environment variables. See

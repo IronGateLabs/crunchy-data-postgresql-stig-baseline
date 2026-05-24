@@ -51,7 +51,7 @@ With pgaudit installed the following configurations can be made:
 $ sudo su - postgres
 $ vi ${PGDATA?}/postgresql.conf
 
-Add the following parameters (or edit existing parameters): 
+Add the following parameters (or edit existing parameters):
 
 pgaudit.log_catalog = 'on'
 pgaudit.log = 'read'

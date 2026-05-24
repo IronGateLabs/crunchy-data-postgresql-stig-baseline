@@ -14,7 +14,7 @@ Database software is capable of a range of actions on data stored within the dat
 forensic analysis, to know exactly when specific actions were performed. This requires the date and time to which an
 audit record refers. If date and time information is not recorded and stored with the audit record, the record itself
 is of very limited use.'
-  desc 'check', 'As the database administrator (usually postgres), run the following SQL: 
+  desc 'check', 'As the database administrator (usually postgres), run the following SQL:
 
 $ sudo su - postgres
 $ psql -c "SHOW log_line_prefix"

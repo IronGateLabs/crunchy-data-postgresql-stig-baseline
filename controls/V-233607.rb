@@ -21,11 +21,11 @@ in the auditing itself. An attacker could also manipulate logs to hide evidence 
 Ensure the PGLOG directory is owned by postgres user and group:
 
 $ sudo su - postgres
-$ ls -la ${PGLOG?} 
+$ ls -la ${PGLOG?}
 
-If PGLOG is not owned by the database owner, this is a finding. 
+If PGLOG is not owned by the database owner, this is a finding.
 
-Ensure the data directory is owned by postgres user and group. 
+Ensure the data directory is owned by postgres user and group.
 
 $ sudo su - postgres
 $ ls -la ${PGDATA?}
@@ -49,7 +49,7 @@ If any role has "superuser" that should not, this is a finding.'
 	supplementary content APPENDIX-F for instructions on configuring PGDATA, APPENDIX-H for PGVER and APPENDIX-I
 	for PGLOG.
 
-If PGLOG or PGDATA are not owned by postgres user and group, configure them as follows: 
+If PGLOG or PGDATA are not owned by postgres user and group, configure them as follows:
 
 $ sudo chown -R postgres:postgres ${PGDATA?}
 $ sudo chown -R postgres:postgres ${PGLOG?}
@@ -95,8 +95,9 @@ $ psql -c "ALTER ROLE <role-name> WITH NOSUPERUSER"'
 
   roles.each do |role|
     next if input('pg_superusers').include?(role)
-    superuser_sql = 'SELECT r.rolsuper FROM pg_catalog.pg_roles r '\
-    "WHERE r.rolname = '#{role}';"
+
+    superuser_sql = 'SELECT r.rolsuper FROM pg_catalog.pg_roles r ' \
+                    "WHERE r.rolname = '#{role}';"
 
     describe sql.query(superuser_sql, [input('pg_db')]) do
       its('output') { should_not eq 't' }

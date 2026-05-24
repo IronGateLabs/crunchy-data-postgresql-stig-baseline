@@ -42,17 +42,17 @@ Unlimited, and is a finding.'
 
 To configure the maximum amount of connections allowed to the database, as the database administrator (shown here
 	as "postgres") change the following in postgresql.conf (the value 10 is an example; set the value to suit
-	local conditions): 
+	local conditions):
 
-$ sudo su - postgres 
-$ vi ${PGDATA?}/postgresql.conf 
-max_connections = 10 
+$ sudo su - postgres
+$ vi ${PGDATA?}/postgresql.conf
+max_connections = 10
 
-Next, restart the database: 
+Next, restart the database:
 
 $ sudo systemctl restart postgresql-${PGVER?}
 
-To limit the amount of connections allowed by a specific role, as the database administrator, run the following SQL: 
+To limit the amount of connections allowed by a specific role, as the database administrator, run the following SQL:
 
 $ psql -c "ALTER ROLE <rolname> CONNECTION LIMIT 1";'
   impact 0.5

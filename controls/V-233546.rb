@@ -16,7 +16,7 @@ objects or code implementing application logic. When security and non-security f
 who have access to non-security functionality may be able to access security functionality.'
   desc 'check', 'Check PostgreSQL settings to determine whether objects or code implementing security functionality are located in a separate security domain, such as a separate database or schema created specifically for security functionality.
 
-By default, all objects in pg_catalog and information_schema are owned by the database administrator. 
+By default, all objects in pg_catalog and information_schema are owned by the database administrator.
 
 To check the access controls for those schemas, as the database administrator (shown here as "postgres"), run the following commands to review the access privileges granted on the data dictionary and security tables, views, sequences, functions and trigger procedures:
 
@@ -55,30 +55,30 @@ database administrator account(s) must not be granted to anyone without official
   tag nist: ['SC-3']
 
   exceptions = "#{input('pg_object_exceptions').map { |e| "'#{e}'" }.join(',')}"
-  object_acl = "^(((#{input('pg_owner')}=[#{input('pg_object_granted_privileges')}]+|"\
-    "=[#{input('pg_object_public_privileges')}]+)\\/\\w+,?)+|)$"
-  schemas = %w(pg_catalog information_schema)
+  object_acl = "^(((#{input('pg_owner')}=[#{input('pg_object_granted_privileges')}]+|" \
+               "=[#{input('pg_object_public_privileges')}]+)\\/\\w+,?)+|)$"
+  schemas = %w[pg_catalog information_schema]
   sql = postgres_session(input('pg_dba'), input('pg_dba_password'), input('pg_host'), input('pg_port'))
 
   schemas.each do |schema|
-    objects_sql = 'SELECT n.nspname, c.relname, c.relkind, '\
-    "pg_catalog.array_to_string(c.relacl, E',') FROM pg_catalog.pg_class c "\
-    'LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace '\
-    "WHERE c.relkind IN ('r', 'v', 'm', 'S', 'f') "\
-    "AND n.nspname ~ '^(#{schema})$' "\
-    "AND pg_catalog.array_to_string(c.relacl, E',') !~ '#{object_acl}' "\
-    "AND c.relname NOT IN (#{exceptions});"
+    objects_sql = 'SELECT n.nspname, c.relname, c.relkind, ' \
+                  "pg_catalog.array_to_string(c.relacl, E',') FROM pg_catalog.pg_class c " \
+                  'LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace ' \
+                  "WHERE c.relkind IN ('r', 'v', 'm', 'S', 'f') " \
+                  "AND n.nspname ~ '^(#{schema})$' " \
+                  "AND pg_catalog.array_to_string(c.relacl, E',') !~ '#{object_acl}' " \
+                  "AND c.relname NOT IN (#{exceptions});"
 
     describe sql.query(objects_sql, [input('pg_db')]) do
       its('output') { should eq '' }
     end
 
-    functions_sql = 'SELECT n.nspname, p.proname, '\
-    'pg_catalog.pg_get_userbyid(n.nspowner) '\
-    'FROM pg_catalog.pg_proc p '\
-    'LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace '\
-    "WHERE n.nspname ~ '^(#{schema})$' "\
-    "AND pg_catalog.pg_get_userbyid(n.nspowner) <> '#{input('pg_owner')}';"
+    functions_sql = 'SELECT n.nspname, p.proname, ' \
+                    'pg_catalog.pg_get_userbyid(n.nspowner) ' \
+                    'FROM pg_catalog.pg_proc p ' \
+                    'LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace ' \
+                    "WHERE n.nspname ~ '^(#{schema})$' " \
+                    "AND pg_catalog.pg_get_userbyid(n.nspowner) <> '#{input('pg_owner')}';"
 
     describe sql.query(functions_sql, [input('pg_db')]) do
       its('output') { should eq '' }

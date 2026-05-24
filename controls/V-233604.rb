@@ -54,7 +54,7 @@ If either setting is off, this is a finding.'
   desc 'fix', "Note: The following instructions use the PGDATA and PGVER environment variables. See
 	supplementary content APPENDIX-F for instructions on configuring PGDATA and APPENDIX-H for PGVER.
 
-To ensure that logging is enabled, review supplementary content APPENDIX-C for instructions on enabling logging. 
+To ensure that logging is enabled, review supplementary content APPENDIX-C for instructions on enabling logging.
 
 If logging is enabled the following configurations must be made to log connections, date/time, username and
 session identifier.
@@ -85,7 +85,7 @@ $ sudo systemctl reload postgresql-${PGVER?}"
 
   sql = postgres_session(input('pg_dba'), input('pg_dba_password'), input('pg_host'), input('pg_port'))
 
-  log_line_prefix_escapes = %w(%m %u %d %s)
+  log_line_prefix_escapes = %w[%m %u %d %s]
   log_line_prefix_escapes.each do |escape|
     describe sql.query('SHOW log_line_prefix;', [input('pg_db')]) do
       its('output') { should include escape }
