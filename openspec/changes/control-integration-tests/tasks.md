@@ -1,8 +1,8 @@
 ## 1. Fix connection wiring
 
-- [ ] 1.1 Reproduce the `database "testuser" does not exist` failures and confirm the cause (queries defaulting dbname to username)
-- [ ] 1.2 Align the test fixtures and example input so the profile connects (create the expected role/database in `init.sql`, or adjust `pg_dba`/`pg_db`)
-- [ ] 1.3 Re-run the profile against the vanilla DB and confirm results reflect config findings, not connection errors
+- [x] 1.1 Reproduce the `database "testuser" does not exist` failures and confirm the cause: ~21 of 164 `sql.query` calls pass no db, so psql defaults the dbname to the user (`testuser`), which doesn't exist
+- [x] 1.2 Create the `testuser` database in `init.sql` so those cluster-level/no-db queries connect (verified via psql)
+- [~] 1.3 Re-run the profile against the vanilla DB and confirm results reflect config findings, not connection errors (verifying via validate CI)
 
 ## 2. Vanilla state + regression threshold
 
