@@ -36,26 +36,11 @@ jobs:
           files: coverage/lcov.info
           fail_ci_if_error: false
 
-      # TEMPORARY: the SonarCloud UI toggle would not disable Automatic Analysis
-      # (sonar.autoscan.enabled was true at project + org), so disable it via the
-      # API before scanning. Remove this step once a CI scan has succeeded.
-      - name: Disable SonarCloud Automatic Analysis
-        if: ${{ env.SONAR_TOKEN != '' }}
-        run: |
-          read_val() { curl -s -u "$SONAR_TOKEN:" "https://sonarcloud.io/api/settings/values?$1" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(next((s.get("value") for s in d.get("settings",[]) if s["key"]=="sonar.autoscan.enabled"),"unset"))'; }
-          echo "before: project=$(read_val component=IronGateLabs_crunchy-data-postgresql-stig-baseline) org=$(read_val organization=irongatelabs)"
-          curl -s -u "$SONAR_TOKEN:" -X POST "https://sonarcloud.io/api/settings/set" \
-            --data-urlencode "key=sonar.autoscan.enabled" --data-urlencode "value=false" \
-            --data-urlencode "component=IronGateLabs_crunchy-data-postgresql-stig-baseline" -w "set(project) HTTP %{http_code}\n"
-          curl -s -u "$SONAR_TOKEN:" -X POST "https://sonarcloud.io/api/settings/set" \
-            --data-urlencode "key=sonar.autoscan.enabled" --data-urlencode "value=false" \
-            --data-urlencode "organization=irongatelabs" -w "set(org) HTTP %{http_code}\n"
-          echo "after: project=$(read_val component=IronGateLabs_crunchy-data-postgresql-stig-baseline) org=$(read_val organization=irongatelabs)"
-
-      # TEMPORARY continue-on-error: the SonarCloud project still has "Automatic
-      # Analysis" enabled, which conflicts with this CI scan. Once it is disabled
-      # (Administration > Analysis Method) and a scan succeeds, remove this line
-      # to make the gate blocking.
+      # TEMPORARY continue-on-error: this CI scan conflicts with SonarCloud
+      # "Automatic Analysis", which is enabled at the ORGANIZATION level
+      # (sonar.autoscan.enabled=true for org `irongatelabs`) and cannot be changed
+      # per-project or via API token. An org admin must disable Automatic Analysis
+      # in the SonarCloud org settings; then remove this line to make it blocking.
       - name: SonarCloud scan
         if: ${{ env.SONAR_TOKEN != '' }}
         continue-on-error: true
