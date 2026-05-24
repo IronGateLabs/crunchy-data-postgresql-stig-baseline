@@ -1,0 +1,21 @@
+# Regression guard for the unhardened ("vanilla") docker-compose database.
+#
+# The vanilla state is expected to FAIL most controls, so these bounds are
+# intentionally loose — they catch MAJOR regressions, not small drift between
+# local and CI runners:
+#   - passed.total.min  : passing controls must not collapse (e.g. a broken
+#                         resource that makes everything fail).
+#   - error.total.max   : errored controls must stay low (an error spike means
+#                         the profile itself broke — e.g. the connection bug).
+#   - skipped.total.max : skips must not balloon (controls silently not running).
+#
+# Observed baselines: ~10-11 passed, ~40 skipped, <=5 errored.
+passed:
+  total:
+    min: 8
+error:
+  total:
+    max: 10
+skipped:
+  total:
+    max: 45

@@ -1,14 +1,14 @@
 ## 1. Fix connection wiring
 
-- [ ] 1.1 Reproduce the `database "testuser" does not exist` failures and confirm the cause (queries defaulting dbname to username)
-- [ ] 1.2 Align the test fixtures and example input so the profile connects (create the expected role/database in `init.sql`, or adjust `pg_dba`/`pg_db`)
-- [ ] 1.3 Re-run the profile against the vanilla DB and confirm results reflect config findings, not connection errors
+- [x] 1.1 Reproduce the `database "testuser" does not exist` failures and confirm the cause: ~21 of 164 `sql.query` calls pass no db, so psql defaults the dbname to the user (`testuser`), which doesn't exist
+- [x] 1.2 Create the `testuser` database in `init.sql` so those cluster-level/no-db queries connect (verified via psql)
+- [x] 1.3 Re-ran the profile against the vanilla DB in CI: zero `database "testuser" does not exist` errors (was the dominant connection failure); remaining failures are genuine config findings
 
 ## 2. Vanilla state + regression threshold
 
-- [ ] 2.1 Capture a baseline run against the vanilla docker-compose DB to JSON
-- [ ] 2.2 Generate `vanilla.threshold.yml` from that baseline (regression guard)
-- [ ] 2.3 Add `saf validate threshold` against the vanilla result and confirm it passes
+- [x] 2.1 Captured a baseline run against the vanilla docker-compose DB (113 controls: ~11 passed / ~60 failed / 40 skipped)
+- [x] 2.2 Wrote a tolerant `test/integration/vanilla.threshold.yml` (passed floor, error + skipped ceilings) that guards major regressions without breaking on local/CI drift
+- [x] 2.3 Added `integration.yml` running `saf validate threshold` (mitre/saf_action); green in CI
 
 ## 3. Hardened state
 
