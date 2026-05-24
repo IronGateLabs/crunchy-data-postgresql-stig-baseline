@@ -36,14 +36,8 @@ jobs:
           files: coverage/lcov.info
           fail_ci_if_error: false
 
-      # TEMPORARY continue-on-error: this CI scan conflicts with SonarCloud
-      # "Automatic Analysis", which is enabled at the ORGANIZATION level
-      # (sonar.autoscan.enabled=true for org `irongatelabs`) and cannot be changed
-      # per-project or via API token. An org admin must disable Automatic Analysis
-      # in the SonarCloud org settings; then remove this line to make it blocking.
       - name: SonarCloud scan
         if: ${{ env.SONAR_TOKEN != '' }}
-        continue-on-error: true
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_HOST_URL: https://sonarcloud.io
