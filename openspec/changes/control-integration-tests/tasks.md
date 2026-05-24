@@ -8,7 +8,7 @@
 
 - [x] 2.1 Captured a baseline run against the vanilla docker-compose DB (113 controls: ~11 passed / ~60 failed / 40 skipped)
 - [x] 2.2 Wrote a tolerant `test/integration/vanilla.threshold.yml` (passed floor, error + skipped ceilings) that guards major regressions without breaking on local/CI drift
-- [~] 2.3 Added `integration.yml` running `saf validate threshold`; passes locally, confirming in CI
+- [x] 2.3 Added `integration.yml` running `saf validate threshold` (mitre/saf_action); green in CI
 
 ## 3. Hardened state
 
