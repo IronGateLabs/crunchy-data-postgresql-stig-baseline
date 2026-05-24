@@ -6,9 +6,9 @@
 
 ## 2. Vanilla state + regression threshold
 
-- [ ] 2.1 Capture a baseline run against the vanilla docker-compose DB to JSON
-- [ ] 2.2 Generate `vanilla.threshold.yml` from that baseline (regression guard)
-- [ ] 2.3 Add `saf validate threshold` against the vanilla result and confirm it passes
+- [x] 2.1 Captured a baseline run against the vanilla docker-compose DB (113 controls: ~11 passed / ~60 failed / 40 skipped)
+- [x] 2.2 Wrote a tolerant `test/integration/vanilla.threshold.yml` (passed floor, error + skipped ceilings) that guards major regressions without breaking on local/CI drift
+- [~] 2.3 Added `integration.yml` running `saf validate threshold`; passes locally, confirming in CI
 
 ## 3. Hardened state
 
