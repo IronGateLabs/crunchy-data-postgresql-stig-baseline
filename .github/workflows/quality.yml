@@ -42,12 +42,11 @@ jobs:
       - name: Diagnose SonarCloud analysis method
         if: ${{ env.SONAR_TOKEN != '' }}
         run: |
-          echo "::group::project settings (auto*)"
-          curl -s -u "$SONAR_TOKEN:" "https://sonarcloud.io/api/settings/values?component=IronGateLabs_crunchy-data-postgresql-stig-baseline" | tr ',{}' '\n' | grep -i auto || echo "no auto* project settings"
-          echo "::endgroup::"
-          echo "::group::org settings (auto*)"
-          curl -s -u "$SONAR_TOKEN:" "https://sonarcloud.io/api/settings/values?organization=irongatelabs" | tr ',{}' '\n' | grep -i auto || echo "no auto* org settings"
-          echo "::endgroup::"
+          for scope in "component=IronGateLabs_crunchy-data-postgresql-stig-baseline" "organization=irongatelabs"; do
+            echo "--- $scope ---"
+            curl -s -u "$SONAR_TOKEN:" "https://sonarcloud.io/api/settings/values?$scope" \
+              | python3 -c 'import sys,json; d=json.load(sys.stdin); rows=[(s["key"], s.get("value", s.get("values"))) for s in d.get("settings",[]) if "autoscan" in s["key"].lower()]; print("\n".join(f"{k} = {v}" for k,v in rows) or "no autoscan setting at this scope")'
+          done
 
       # TEMPORARY continue-on-error: the SonarCloud project still has "Automatic
       # Analysis" enabled, which conflicts with this CI scan. Once it is disabled
