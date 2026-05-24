@@ -2,7 +2,7 @@
 
 - [x] 1.1 Reproduce the `database "testuser" does not exist` failures and confirm the cause: ~21 of 164 `sql.query` calls pass no db, so psql defaults the dbname to the user (`testuser`), which doesn't exist
 - [x] 1.2 Create the `testuser` database in `init.sql` so those cluster-level/no-db queries connect (verified via psql)
-- [~] 1.3 Re-run the profile against the vanilla DB and confirm results reflect config findings, not connection errors (verifying via validate CI)
+- [x] 1.3 Re-ran the profile against the vanilla DB in CI: zero `database "testuser" does not exist` errors (was the dominant connection failure); remaining failures are genuine config findings
 
 ## 2. Vanilla state + regression threshold
 
