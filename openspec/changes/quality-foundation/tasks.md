@@ -44,6 +44,7 @@
 - [x] 7.2 Verify all workflows run green on the draft PR (lint, validate, quality all ✅ on PR #1)
 - [x] 7.3 Reconcile the README's quality-workflow section (added `rake test`, CI section, InSpec 5 note)
 
-> Remaining manual step for the fork owner: disable **Automatic Analysis** in the
-> SonarCloud project so the CI scan (with coverage) runs, then drop
-> `continue-on-error` from the SonarCloud step in `quality.yml`.
+> SonarCloud resolved: Automatic Analysis was disabled at the project level
+> (org-level disable is Enterprise-only); the CI scan now feeds coverage via
+> SimpleCov's JSON formatter (`coverage/coverage.json`) and the quality gate
+> passes (90% new-code coverage, 0% duplication). The scan is a blocking gate.
