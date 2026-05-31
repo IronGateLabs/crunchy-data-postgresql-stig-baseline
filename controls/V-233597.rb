@@ -71,7 +71,12 @@ $ psql -c "REVOKE ALL PRIVILEGES ON <table> FROM <role_name>"'
 
   schema_granted_privileges = 'UC'
   schema_public_privileges = 'U'
-  schema_acl = "^((((#{owners})=[#{schema_granted_privileges}]+|"\
+  # PostgreSQL 15+ changed the default owner of the built-in `public` schema from
+  # the bootstrap superuser to the predefined `pg_database_owner` role, so the
+  # stock public-schema ACL is `pg_database_owner=UC/...,=U/...`. Accept that
+  # predefined owner alongside the configured owners; any other unexpected
+  # grantee/privilege still fails the match.
+  schema_acl = "^(((((#{owners})|pg_database_owner)=[#{schema_granted_privileges}]+|"\
     "=[#{schema_public_privileges}]+)\/\\w+,?)+|)\\|"
   schema_acl_regex = Regexp.new(schema_acl)
 

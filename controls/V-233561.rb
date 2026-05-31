@@ -52,15 +52,19 @@ for instructions on enabling logging.'
     # so no denial is ever logged), then create the role and run SET ROLE +
     # DROP ROLE in one statement so the drop is performed as the unprivileged
     # role rather than the connecting superuser.
-    describe sql.query('RESET ROLE; DROP ROLE IF EXISTS pgauditrolefailuretest; CREATE ROLE pgauditrolefailuretest;', [input('pg_db')]) do
+    # Dropping `postgres` while connected as postgres raises "current user cannot
+    # be dropped", not "permission denied to drop role". To exercise the denial,
+    # create a separate target role and attempt to drop it as the unprivileged
+    # role (which lacks CREATEROLE/admin), which is what must be denied and audited.
+    describe sql.query('RESET ROLE; DROP ROLE IF EXISTS pgauditrolefailuretest; DROP ROLE IF EXISTS pgauditdroptarget; CREATE ROLE pgauditdroptarget; CREATE ROLE pgauditrolefailuretest;', [input('pg_db')]) do
       its('output') { should match // }
     end
 
-    describe sql.query('SET ROLE pgauditrolefailuretest; DROP ROLE postgres;', [input('pg_db')]) do
+    describe sql.query('SET ROLE pgauditrolefailuretest; DROP ROLE pgauditdroptarget;', [input('pg_db')]) do
       its('output') { should match // }
     end
 
-    describe sql.query('RESET ROLE; DROP ROLE IF EXISTS pgauditrolefailuretest;', [input('pg_db')]) do
+    describe sql.query('RESET ROLE; DROP ROLE IF EXISTS pgauditrolefailuretest; DROP ROLE IF EXISTS pgauditdroptarget;', [input('pg_db')]) do
       its('output') { should match // }
     end
 

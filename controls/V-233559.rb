@@ -70,7 +70,13 @@ $ sudo systemctl reload postgresql-${PGVER?}"
     # statement so the assertion still confirms an audited CREATE TABLE of the
     # security object regardless of stderr-vs-csvlog formatting.
     describe command("grep -r \"AUDIT: SESSION\" #{input('pg_audit_log_dir')}") do
-      its('stdout') { should match /^.*CREATE TABLE[",]+CREATE TABLE stig_test.*$/ }
+      # pgaudit emits DDL records as: <command>,<object_type>,<object_name>,<statement>.
+      # For "CREATE TABLE stig_test" that is "CREATE TABLE,TABLE,public.stig_test,
+      # CREATE TABLE stig_test...". Match the audit command verb followed by the
+      # object-type and object-name columns (which may also be empty) and the
+      # audited statement, tolerating csvlog quoting, so the assertion still
+      # confirms an audited CREATE TABLE of the security object.
+      its('stdout') { should match /^.*CREATE TABLE,[^,]*,[^,]*,["]*CREATE TABLE stig_test.*$/ }
     end
 
     describe command("grep -r \"AUDIT: SESSION\" #{input('pg_audit_log_dir')}") do
