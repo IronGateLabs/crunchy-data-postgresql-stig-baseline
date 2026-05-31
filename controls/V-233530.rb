@@ -78,14 +78,19 @@ $ psql -c "REVOKE CREATE ON SCHEMA test FROM bob")
     functions_sql = ''
 
     if database == 'postgres'
+      # PostgreSQL 15+ changed the default owner of the built-in `public` schema
+      # from the bootstrap superuser to the predefined `pg_database_owner` role.
+      # That role is a fixed part of the cluster and is the documented owner of
+      # `public`, so treat it as authorized alongside pg_owner. Any other
+      # unexpected owner still fails the check.
       schemas_sql = 'SELECT n.nspname, pg_catalog.pg_get_userbyid(n.nspowner) '\
         'FROM pg_catalog.pg_namespace n '\
-        "WHERE pg_catalog.pg_get_userbyid(n.nspowner) <> '#{input('pg_owner')}';"
+        "WHERE pg_catalog.pg_get_userbyid(n.nspowner) NOT IN ('#{input('pg_owner')}', 'pg_database_owner');"
       functions_sql = 'SELECT n.nspname, p.proname, '\
         'pg_catalog.pg_get_userbyid(n.nspowner) '\
         'FROM pg_catalog.pg_proc p '\
         'LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace '\
-        "WHERE pg_catalog.pg_get_userbyid(n.nspowner) <> '#{input('pg_owner')}';"
+        "WHERE pg_catalog.pg_get_userbyid(n.nspowner) NOT IN ('#{input('pg_owner')}', 'pg_database_owner');"
     else
       schemas_sql = 'SELECT n.nspname, pg_catalog.pg_get_userbyid(n.nspowner) '\
         'FROM pg_catalog.pg_namespace n '\

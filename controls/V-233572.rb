@@ -67,20 +67,30 @@ content APPENDIX-C for instructions on enabling logging.'
   sql = postgres_session(input('pg_dba'), input('pg_dba_password'), input('pg_host'), input('pg_port'))
 
   if file(input('pg_audit_log_dir')).exist?
-    describe sql.query('CREATE ROLE fooaudit; SET ROLE fooaudit; CREATE ROLE fooauditbad SUPERUSER;', [input('pg_db')]) do
-      its('output') { should match // }
-    end
-
-    describe command("grep -r \"must be superuser to create superusers\" #{input('pg_audit_log_dir')}") do
-      its('stdout') { should match /^.*must be superuser to create superusers.*$/ }
-    end
-
-    describe sql.query('CREATE ROLE fooauditbad CREATEDB; CREATE ROLE fooauditbad CREATEROLE;', [input('pg_db')]) do
+    # PostgreSQL 16 reworked the role-attribute privilege messages: the
+    # pre-16 "must be superuser to create superusers" wording was removed and
+    # every unauthorized CREATE ROLE attempt (whether requesting SUPERUSER or
+    # made by a role lacking CREATEROLE) is now reported as
+    # "permission denied to create role". The privileged statements must also
+    # run inside the SET ROLE session so they are actually performed as the
+    # unprivileged role rather than as the connecting superuser.
+    describe sql.query('DROP ROLE IF EXISTS fooaudit; CREATE ROLE fooaudit; SET ROLE fooaudit; CREATE ROLE fooauditbad SUPERUSER;', [input('pg_db')]) do
       its('output') { should match // }
     end
 
     describe command("grep -r \"permission denied to create role\" #{input('pg_audit_log_dir')}") do
       its('stdout') { should match /^.*permission denied to create role.*$/ }
+    end
+
+    describe sql.query('SET ROLE fooaudit; CREATE ROLE fooauditbad CREATEDB; CREATE ROLE fooauditbad CREATEROLE;', [input('pg_db')]) do
+      its('output') { should match // }
+    end
+
+    describe command("grep -r \"permission denied to create role\" #{input('pg_audit_log_dir')}") do
+      its('stdout') { should match /^.*permission denied to create role.*$/ }
+    end
+
+    describe sql.query('RESET ROLE; DROP ROLE IF EXISTS fooaudit;', [input('pg_db')]) do
     end
   else
     describe "The #{input('pg_audit_log_dir')} directory was not found. Check path for this postgres version/install to define the value for the 'input('pg_audit_log_dir')' inspec input parameter." do

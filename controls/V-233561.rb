@@ -45,7 +45,22 @@ for instructions on enabling logging.'
   sql = postgres_session(input('pg_dba'), input('pg_dba_password'), input('pg_host'), input('pg_port'))
 
   if file(input('pg_audit_log_dir')).exist?
-    describe sql.query('CREATE ROLE pgauditrolefailuretest; SET ROLE pgauditrolefailuretest; DROP ROLE postgres; SET ROLE postgres; DROP ROLE pgauditrolefailuretest;', [input('pg_db')]) do
+    # PostgreSQL 16 retains the "permission denied to drop role" wording, but
+    # the denial is only generated when the DROP actually runs as the
+    # unprivileged role. Clear any stale role first (a leftover role from a
+    # prior run makes the original single-batch CREATE abort before SET ROLE,
+    # so no denial is ever logged), then create the role and run SET ROLE +
+    # DROP ROLE in one statement so the drop is performed as the unprivileged
+    # role rather than the connecting superuser.
+    describe sql.query('RESET ROLE; DROP ROLE IF EXISTS pgauditrolefailuretest; CREATE ROLE pgauditrolefailuretest;', [input('pg_db')]) do
+      its('output') { should match // }
+    end
+
+    describe sql.query('SET ROLE pgauditrolefailuretest; DROP ROLE postgres;', [input('pg_db')]) do
+      its('output') { should match // }
+    end
+
+    describe sql.query('RESET ROLE; DROP ROLE IF EXISTS pgauditrolefailuretest;', [input('pg_db')]) do
       its('output') { should match // }
     end
 

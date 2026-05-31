@@ -54,8 +54,14 @@ $ sudo systemctl restart postgresql-${PGVER?})
     its('output') { should match /on|true|scram-sha-256/i }
   end
 
+  # PostgreSQL 16 defaults to (and this baseline requires) scram-sha-256
+  # password hashing, so pg_shadow.passwd holds "SCRAM-SHA-256$..." digests
+  # rather than legacy "md5..." digests. The original md5-only regex flagged
+  # the stronger SCRAM hashes as if they were plaintext. Accept either hashed,
+  # salted form; any password that is neither (i.e. stored in plaintext) is
+  # still reported as a finding.
   passwords_sql = 'SELECT usename FROM pg_shadow '\
-    "WHERE passwd !~ '^md5[0-9a-f]+$';"
+    "WHERE passwd IS NOT NULL AND passwd !~ '^(md5[0-9a-f]+|SCRAM-SHA-256\\$.+)$';"
 
   describe sql.query(passwords_sql, [input('pg_db')]) do
     its('output') { should eq '' }

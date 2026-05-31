@@ -87,7 +87,7 @@ $ psql -c "REVOKE ALL PRIVILEGES ON <table> FROM <role_name>"'
       its('output') { should match database_acl_regex }
     end
 
-    schemas_sql = 'SELECT n.nspname, FROM pg_catalog.pg_namespace n '\
+    schemas_sql = 'SELECT n.nspname FROM pg_catalog.pg_namespace n '\
     "WHERE n.nspname !~ '^pg_' AND n.nspname <> 'information_schema';"
     schemas_query = sql.query(schemas_sql, [database])
     # Handle connection disabled on database

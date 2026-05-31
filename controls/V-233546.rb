@@ -55,7 +55,16 @@ database administrator account(s) must not be granted to anyone without official
   tag nist: ['SC-3']
 
   exceptions = "#{input('pg_object_exceptions').map { |e| "'#{e}'" }.join(',')}"
+  # PostgreSQL 14+ ships catalog views (e.g. pg_backend_memory_contexts,
+  # pg_shmem_allocations, pg_config) whose default relacl grants read-only
+  # access to the built-in predefined monitoring roles (pg_read_all_stats,
+  # pg_read_all_settings, pg_monitor, ...). Those grants are part of stock
+  # PostgreSQL, not a local privilege grant, so the allowlist must accept a
+  # pg_* predefined-role grantee holding only read (r) privilege. Any
+  # non-predefined grantee, or any predefined role granted more than read,
+  # still fails the regex and is reported as a finding.
   object_acl = "^(((#{input('pg_owner')}=[#{input('pg_object_granted_privileges')}]+|"\
+    "pg_\\w+=r+|"\
     "=[#{input('pg_object_public_privileges')}]+)\\/\\w+,?)+|)$"
   schemas = %w(pg_catalog information_schema)
   sql = postgres_session(input('pg_dba'), input('pg_dba_password'), input('pg_host'), input('pg_port'))

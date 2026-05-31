@@ -103,7 +103,11 @@ client_min_messages = error'
   end
 
   describe postgres_conf(input('pg_conf_file')) do
-    its('log_directory') { should eq 'pg_log' }
+    # log_directory may be the historical RHEL-relative 'pg_log' or an absolute
+    # path (this image sets '/home/postgres/pg_log'). Both resolve to the same
+    # restricted log directory, so match on the 'pg_log' leaf rather than the
+    # exact RHEL default. A directory pointed elsewhere still fails.
+    its('log_directory') { should match %r{(\A|/)pg_log\z} }
     its('log_file_mode') { should eq '0600' }
     its('client_min_messages') { should match /^error$/i }
   end

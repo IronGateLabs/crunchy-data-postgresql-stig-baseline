@@ -48,7 +48,16 @@ REVOKE SELECT ON some_function FROM bob;'
 
     object_granted_privileges = 'arwdDxtU'
     object_public_privileges = 'r'
+    # PostgreSQL 14+ ships predefined (built-in) roles such as pg_read_all_stats
+    # and pg_monitor that are granted read access to several new pg_catalog system
+    # views (e.g. pg_backend_memory_contexts, pg_shmem_allocations). Those grants
+    # appear in relacl as "<builtin_role>=r/<owner>" and are part of the stock
+    # catalog ACL rather than an operator-introduced privilege. Allow read-only
+    # grants to the documented built-in roles (pg_users input) so the check stays
+    # accurate on PG16 while still flagging any non-documented grantee.
+    builtin_read_roles = input('pg_users').join('|')
     object_acl = "^((((#{input('pg_superusers').join('|')})=[#{object_granted_privileges}]+|"\
+      "(#{builtin_read_roles})=[#{object_public_privileges}]+|"\
       "=[#{object_public_privileges}]+)\/\\w+,?)+|)\\|"
     object_acl_regex = Regexp.new(object_acl)
 

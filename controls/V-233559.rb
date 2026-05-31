@@ -62,8 +62,15 @@ $ sudo systemctl reload postgresql-${PGVER?}"
       its('output') { should match // }
     end
 
+    # With csvlog enabled (log_destination includes csvlog) the pgaudit record
+    # is emitted inside a quoted CSV field, so the empty object-type/object-name
+    # columns may render as ,"", and the leading quote of the statement column
+    # may be doubled. Tolerate optional CSV quote/comma characters between the
+    # "CREATE TABLE" audit command and the audited "CREATE TABLE stig_test"
+    # statement so the assertion still confirms an audited CREATE TABLE of the
+    # security object regardless of stderr-vs-csvlog formatting.
     describe command("grep -r \"AUDIT: SESSION\" #{input('pg_audit_log_dir')}") do
-      its('stdout') { should match /^.*CREATE TABLE,,,CREATE TABLE stig_test.*$/ }
+      its('stdout') { should match /^.*CREATE TABLE[",]+CREATE TABLE stig_test.*$/ }
     end
 
     describe command("grep -r \"AUDIT: SESSION\" #{input('pg_audit_log_dir')}") do

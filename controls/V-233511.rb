@@ -57,7 +57,10 @@ $ export PGPORT=5432'
   sql = postgres_session(input('pg_dba'), input('pg_dba_password'), input('pg_host'), input('pg_port'))
 
   describe sql.query('SHOW port;', [input('pg_db')]) do
-    its('output') { should eq input('pg_port') }
+    # `SHOW port` always returns the port as text, while pg_port may be supplied
+    # as a numeric input (e.g. 5432). Use `cmp` so the comparison coerces types
+    # instead of failing 5432 (Integer) vs "5432" (String).
+    its('output') { should cmp input('pg_port') }
   end
 
   if virtualization.system == 'docker'

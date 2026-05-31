@@ -48,8 +48,13 @@ APPENDIX-C for instructions on enabling logging.'
       its('output') { should match /CREATE TABLE/ }
     end
 
+    # The original regex required a "[sudo] password for ...:" prefix that only
+    # appears when psql is invoked through an interactive sudo session. When the
+    # profile connects to PostgreSQL directly (as in a container) that prompt is
+    # never emitted, so the prefix is matched optionally. The denial itself
+    # ("permission denied for relation|table test") is still required.
     describe sql.query('SET ROLE bob; GRANT ALL PRIVILEGES ON test TO bob;', [input('pg_db')]) do
-      its('output') { should match /\[sudo\] password for .*: ERROR:  permission denied for (relation|table) test/ }
+      its('output') { should match /(\[sudo\] password for .*: )?ERROR:  permission denied for (relation|table) test/ }
     end
 
     describe command("grep -r \"permission denied for relation\\|table test\" #{input('pg_audit_log_dir')}") do
